@@ -1,4 +1,5 @@
-- name: Konfiguration of postfix
+---
+- name: Playbook postfix
   hosts: webserver
   become: true
   tags: postfix

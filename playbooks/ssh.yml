@@ -1,4 +1,5 @@
-- name: Konfiguration of ssh
+---
+- name: Playbook ssh
   hosts: all
   become: true
   tags: ssh

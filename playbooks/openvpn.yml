@@ -1,0 +1,8 @@
+- name: Playbook openvpn
+  hosts: all
+  become: true
+  tags: openvpn
+  tasks:
+    - name: Include openvpn role
+      ansible.builtin.include_role:
+        name: openvpn

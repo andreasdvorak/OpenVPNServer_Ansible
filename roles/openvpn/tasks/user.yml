@@ -1,0 +1,14 @@
+---
+- name: Ensure the group 'openvpn' exists
+  ansible.builtin.group:
+    name: openvpn
+    state: present
+    gid: 900
+
+- name: Ensure the user 'openvpn' exists
+  ansible.builtin.user:
+    name: openvpn
+    state: present
+    comment: "OpenVPN User"
+    uid: 900
+    group: openvpn

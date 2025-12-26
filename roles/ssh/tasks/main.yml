@@ -1,7 +1,7 @@
 ---
-- name: Configure ssh alert
-  ansible.builtin.import_tasks:
-    file: ssh_alert.yaml
+# - name: Configure ssh alert
+#  ansible.builtin.import_tasks:
+#    file: ssh_alert.yaml
 
 - name: Disable Root Login
   ansible.builtin.lineinfile:

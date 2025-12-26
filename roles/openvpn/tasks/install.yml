@@ -1,0 +1,5 @@
+---
+- name: Ensure package openvpn is installed
+  ansible.builtin.package:
+    name: openvpn
+    state: present

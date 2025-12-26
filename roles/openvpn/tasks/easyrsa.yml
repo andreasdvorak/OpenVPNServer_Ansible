@@ -1,0 +1,74 @@
+---
+- name: Ensure destination directory exists
+  ansible.builtin.file:
+    path: "{{ easy_rsa_dest }}"
+    state: directory
+    mode: '0755'
+
+- name: Download easy-rsa release
+  ansible.builtin.get_url:
+    url: "{{ easy_rsa_url }}"
+    dest: "/tmp/EasyRSA-{{ easy_rsa_version }}.tgz"
+    mode: '0644'
+
+- name: Extract easy-rsa archive
+  ansible.builtin.unarchive:
+    src: "/tmp/EasyRSA-{{ easy_rsa_version }}.tgz"
+    dest: "{{ easy_rsa_dest }}"
+    remote_src: yes
+
+- name: Copy vars.example to vars in EasyRSA directory
+  ansible.builtin.copy:
+    src: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars.example"
+    dest: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    remote_src: yes
+    mode: '0644'
+
+- name: Set EASYRSA_REQ_COUNTRY
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_COUNTRY'
+    line: 'set_var EASYRSA_REQ_COUNTRY    "{{ easyrsa_country }}"'
+
+- name: Set EASYRSA_REQ_PROVINCE
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_PROVINCE'
+    line: 'set_var EASYRSA_REQ_PROVINCE   "{{ easyrsa_province }}"'
+
+- name: Set EASYRSA_REQ_CITY
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_CITY'
+    line: 'set_var EASYRSA_REQ_CITY       "{{ easyrsa_city }}"'
+
+- name: Set EASYRSA_REQ_ORG
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_ORG'
+    line: 'set_var EASYRSA_REQ_ORG        "{{ easyrsa_org }}"'
+
+- name: Set EASYRSA_REQ_EMAIL
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_EMAIL'
+    line: 'set_var EASYRSA_REQ_EMAIL      "{{ easyrsa_email }}"'
+
+- name: Set EASYRSA_REQ_OU
+  ansible.builtin.lineinfile:
+    path: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/vars"
+    regexp: '^#set_var EASYRSA_REQ_OU'
+    line: 'set_var EASYRSA_REQ_OU         "{{ easyrsa_ou }}"'
+
+- name: Initialize PKI directory
+  ansible.builtin.command: "./easyrsa init-pki"
+  args:
+    chdir: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}"
+    creates: "/opt/easy-rsa/EasyRSA-v{{ easy_rsa_version }}/pki"
+
+
+- name: Build CA without password
+  ansible.builtin.command: "./easyrsa --batch --req-cn={{ easyrsa_common_name }} build-ca nopass"
+  args:
+    chdir: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}"
+    creates: "/opt/easy-rsa/EasyRSA-{{ easy_rsa_version }}/pki/ca.crt"

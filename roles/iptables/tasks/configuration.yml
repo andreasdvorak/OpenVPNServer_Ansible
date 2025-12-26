@@ -1,5 +1,6 @@
 ---
 - name: Iptables configuration
+  notify: Save current state of the firewall for ipv4
   block:
     - name: Allow packages to loopback interface
       ansible.builtin.iptables:
@@ -55,9 +56,9 @@
 
     - name: Add host specific rules
       ansible.builtin.iptables:
-        chain: INPUT
-        protocol: tcp
-        jump: ACCEPT
+        chain: "{{ item.chain }}"
+        protocol: "{{ item.tcp }}"
+        jump: "{{ item.jump }}"
         destination_port: "{{ item.destination_port }}"
         comment: "{{ item.comment }}"
         state: present
@@ -74,6 +75,3 @@
       ansible.builtin.iptables:
         chain: OUTPUT
         jump: ACCEPT
-  
-  notify: Save current state of the firewall for ipv4
-

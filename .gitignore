@@ -1,5 +1,9 @@
+# Ansible
+.ansible
+
 # VSCode
 *.code-workspace
+.vscode
 
 # inventory
 inventory/hosts*.ini
