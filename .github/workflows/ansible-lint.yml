@@ -1,6 +1,8 @@
 ---
 name: ansible-lint
+# yamllint disable rule:truthy
 on: [push, pull_request]
+# yamllint enable rule:truthy
 
 jobs:
   build:

@@ -34,7 +34,8 @@
   args:
     chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
     creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
-              {{ openvpn_easy_rsa_version }}/pki/reqs/{{ openvpn_client_name }}.req"
+              {{ openvpn_easy_rsa_version }}/pki/reqs/\
+              {{ openvpn_client_name }}.req"
   when:
     - not openvpn_client_req_file.stat.exists
     - not ansible_check_mode
