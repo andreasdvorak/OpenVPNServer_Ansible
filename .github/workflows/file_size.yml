@@ -1,7 +1,11 @@
 ---
 name: Check file sizes
+
+# yamllint disable rule:truthy
 on:
   workflow_dispatch:
+# yamllint enable rule:truthy
+
 jobs:
   test:
     runs-on: ubuntu-latest
