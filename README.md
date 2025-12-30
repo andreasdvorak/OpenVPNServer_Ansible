@@ -43,6 +43,11 @@ install the requirements on the destination host
 python -m pip install -r requirements.txt
 ```
 
+### Ansible collections
+```
+ansible-galaxy collection install -r requirements.yml --collections-path ./collections
+```
+
 ## Ansible
 Installation of Azure collection, but it should be installed by default.
 ## Inventory
