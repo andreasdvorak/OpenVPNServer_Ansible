@@ -1,6 +1,8 @@
 # Introduction
 Installation of an OpenVPNServer with Ansible
 
+The CA comes with EasyRSA and needs to be installed on the same server as OpenVPN.
+
 # Requirements
 You need a Linux server.
 
@@ -92,4 +94,17 @@ show difference
 limit execution to a certain host
 ```
 --limit openvpn
+```
+
+# Linter
+## Yaml lit
+
+```
+yamllint ./inventory/ ./playbooks/ ./roles/
+```
+
+## Ansible lint
+
+```
+ansible-lint .
 ```

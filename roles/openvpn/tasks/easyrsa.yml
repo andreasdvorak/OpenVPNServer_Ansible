@@ -5,53 +5,58 @@
     state: directory
     mode: '0750'
 
-- name: Check if EasyRSA directory exists
+- name: Check if easy rsa version directory exists
   ansible.builtin.stat:
     path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-  register: easy_rsa_dir
+  register: openvpn_easy_rsa_dir
 
 - name: Download easy-rsa release
   ansible.builtin.get_url:
     url: "{{ openvpn_easy_rsa_url }}"
     dest: "/tmp/EasyRSA-{{ openvpn_easy_rsa_version }}.tgz"
     mode: '0644'
-  when: not easy_rsa_dir.stat.exists
+  when: not openvpn_easy_rsa_dir.stat.exists
 
 - name: Extract easy-rsa archive
   ansible.builtin.unarchive:
     src: "/tmp/EasyRSA-{{ openvpn_easy_rsa_version }}.tgz"
     dest: "{{ openvpn_easy_rsa_dest }}"
     remote_src: true
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}"
   when: not ansible_check_mode
 
 - name: Check if EasyRSA vars exists
   ansible.builtin.stat:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
-  register: easy_var_file
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+           {{ openvpn_easy_rsa_version }}/vars"
+  register: openvpn_easy_var_file
 
 - name: Check if EasyRSA vars.example exists
   ansible.builtin.stat:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars.example"
-  register: easy_var_example_file
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           vars.example"
+  register: openvpn_easy_var_example_file
 
 - name: Copy vars.example to vars in EasyRSA directory
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars.example"
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+            vars.example"
     dest: "/opt/easy-rsa/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
     remote_src: true
     mode: '0644'
   when:
-    - not easy_var_file.stat.exists
-    - easy_var_example_file.stat.exists
+    - not openvpn_easy_var_file.stat.exists
+    - openvpn_easy_var_example_file.stat.exists
 
 - name: Set EASYRSA_REQ_COUNTRY
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           vars"
     regexp: '^#set_var EASYRSA_REQ_COUNTRY'
     line: 'set_var EASYRSA_REQ_COUNTRY    "{{ openvpn_easyrsa_country }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Set EASYRSA_REQ_PROVINCE
   ansible.builtin.lineinfile:
@@ -59,52 +64,58 @@
     regexp: '^#set_var EASYRSA_REQ_PROVINCE'
     line: 'set_var EASYRSA_REQ_PROVINCE   "{{ openvpn_easyrsa_province }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Set EASYRSA_REQ_CITY
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           vars"
     regexp: '^#set_var EASYRSA_REQ_CITY'
     line: 'set_var EASYRSA_REQ_CITY       "{{ openvpn_easyrsa_city }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Set EASYRSA_REQ_ORG
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           vars"
     regexp: '^#set_var EASYRSA_REQ_ORG'
     line: 'set_var EASYRSA_REQ_ORG        "{{ openvpn_easyrsa_org }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Set EASYRSA_REQ_EMAIL
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           vars"
     regexp: '^#set_var EASYRSA_REQ_EMAIL'
     line: 'set_var EASYRSA_REQ_EMAIL      "{{ openvpn_easyrsa_email }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Set EASYRSA_REQ_OU
   ansible.builtin.lineinfile:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/vars"
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+            vars"
     regexp: '^#set_var EASYRSA_REQ_OU'
     line: 'set_var EASYRSA_REQ_OU         "{{ openvpn_easyrsa_ou }}"'
   when:
-    - easy_var_file.stat.exists
+    - openvpn_easy_var_file.stat.exists
 
 - name: Check PKI directory
   ansible.builtin.stat:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki"
-  register: pki_dir
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+            pki"
+  register: openvpn_pki_dir
 
 - name: Initialize PKI directory
   ansible.builtin.command: "./easyrsa init-pki"
   args:
     chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/pki"
   when:
-    - not pki_dir.stat.exists
+    - not openvpn_pki_dir.stat.exists
     - not ansible_check_mode
 
 - name: Build CA without password
@@ -117,9 +128,10 @@
       - nopass
   args:
     chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki/ca.crt"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/pki/ca.crt"
   when:
-    - not pki_dir.stat.exists
+    - not openvpn_pki_dir.stat.exists
     - not ansible_check_mode
 
 - name: Build server certificate without password
@@ -132,27 +144,100 @@
       - nopass
   args:
     chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki/reqs/{{ openvpn_easy_rsa_server_name }}.req"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/\
+              pki/reqs/{{ openvpn_easy_rsa_server_name }}.req"
   when:
-    - pki_dir.stat.exists
+    - openvpn_pki_dir.stat.exists
     - not ansible_check_mode
 
-- name: Check if file pki/privat/{{ openvpn_easy_rsa_server_name }}.key exists
-  ansible.builtin.stat:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki/private/{{ openvpn_easy_rsa_server_name }}.key"
-  register: openvpn_easy_rsa_server_name_source_file
-
-- name: Check if file /etc/openvpn/{{ openvpn_easy_rsa_server_name }}.key exists
-  ansible.builtin.stat:
-    path: "/etc/openvpn/{{ openvpn_easy_rsa_server_name }}.key"
-  register: openvpn_easy_rsa_server_name_target_file
-
-- name: Copy vars.example to vars in EasyRSA directory
+- name: Copy key file to /etc/openvpn
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/pki/private/{{ openvpn_easy_rsa_server_name }}.key"
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           pki/private/{{ openvpn_easy_rsa_server_name }}.key"
     dest: "/etc/openvpn"
     remote_src: true
     mode: '0644'
+
+- name: Sign server certificate
+  ansible.builtin.command:
+    argv:
+      - ./easyrsa
+      - --batch
+      - sign-req
+      - server
+      - "{{ openvpn_easy_rsa_server_name }}"
+  args:
+    chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/\
+              pki/issued/{{ openvpn_easy_rsa_server_name }}.crt"
   when:
-    - not openvpn_easy_rsa_server_name_target_file.stat.exists
-    - openvpn_easy_rsa_server_name_source_file.stat.exists
+    - not ansible_check_mode
+
+- name: Copy server crt file to /etc/openvpn
+  ansible.builtin.copy:
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           pki/issued/{{ openvpn_easy_rsa_server_name }}.crt"
+    dest: "/etc/openvpn"
+    remote_src: true
+    mode: '0644'
+
+- name: Copy ca.crt file to /etc/openvpn
+  ansible.builtin.copy:
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           pki/ca.crt"
+    dest: "/etc/openvpn"
+    remote_src: true
+    mode: '0644'
+
+- name: Check if dh.pem file exists
+  ansible.builtin.stat:
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+            pki/dh.pem"
+  register: openvpn_easy_rsa_dh_pem_source_file
+
+- name: Generate Diffie-Hellman parameters
+  ansible.builtin.command: "./easyrsa gen-dh"
+  args:
+    chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/pki/dh.pem"
+  when:
+    - not openvpn_easy_rsa_dh_pem_source_file.stat.exists
+
+- name: Copy dh.pem file to /etc/openvpn
+  ansible.builtin.copy:
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           pki/dh.pem"
+    dest: "/etc/openvpn"
+    remote_src: true
+    mode: '0644'
+
+- name: Check if ta.key source file exists
+  ansible.builtin.stat:
+    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+            ta.key"
+  register: openvpn_easy_rsa_ta_key_source_file
+
+- name: Generate ta.key file
+  ansible.builtin.command:
+    argv:
+      - openvpn
+      - --genkey
+      - --secret
+      - ta.key
+  args:
+    chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
+    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
+              {{ openvpn_easy_rsa_version }}/ta.key"
+  when:
+    - not openvpn_easy_rsa_ta_key_source_file.stat.exists
+
+- name: Copy ta.key file to /etc/openvpn
+  ansible.builtin.copy:
+    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+           ta.key"
+    dest: "/etc/openvpn"
+    remote_src: true
+    mode: '0644'

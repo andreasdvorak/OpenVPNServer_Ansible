@@ -10,3 +10,7 @@
 - name: Installation of EasyRSA
   ansible.builtin.import_tasks:
     file: easyrsa.yml
+
+- name: Configure clients
+  ansible.builtin.import_tasks:
+    file: clients.yml

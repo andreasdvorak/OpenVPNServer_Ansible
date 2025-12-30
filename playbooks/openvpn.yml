@@ -1,3 +1,4 @@
+---
 - name: Playbook openvpn
   hosts: all
   become: true
