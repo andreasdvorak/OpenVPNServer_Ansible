@@ -5,3 +5,4 @@ openvpn_easy_rsa_url: "https://github.com/OpenVPN/easy-rsa/releases/download/\
 openvpn_easy_rsa_dest: "/home/openvpn"
 openvpn_home: "/home/openvpn"
 openvpn_easy_rsa_server_name: "server"
+openvpn_ta_enabled: true        # Enable tls-auth

@@ -219,6 +219,7 @@
     path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
             ta.key"
   register: openvpn_easy_rsa_ta_key_source_file
+  when: openvpn_ta_enabled == true
 
 - name: Generate ta.key file
   ansible.builtin.command:
@@ -233,6 +234,7 @@
               {{ openvpn_easy_rsa_version }}/ta.key"
   when:
     - not openvpn_easy_rsa_ta_key_source_file.stat.exists
+    - openvpn_ta_enabled == true
 
 - name: Copy ta.key file to /etc/openvpn
   ansible.builtin.copy:
@@ -241,3 +243,4 @@
     dest: "/etc/openvpn"
     remote_src: true
     mode: '0644'
+  when: openvpn_ta_enabled == true
