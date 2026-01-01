@@ -1,0 +1,40 @@
+---
+- name: Enable packet forwarding
+  ansible.posix.sysctl:
+    name: net.ipv4.ip_forward
+    value: '1'
+    state: present
+    reload: true
+
+- name: Iptables configuration for OpenVPN
+  notify: Save current state of the firewall for ipv4
+  block:
+    - name: NAT Masquerading for default interface
+      ansible.builtin.iptables:
+        table: nat
+        chain: POSTROUTING
+        out_interface: "{{ ansible_facts['default_ipv4']['interface'] }}"
+        jump: MASQUERADE
+
+    - name: Forwarding for VPN network
+      ansible.builtin.iptables:
+        chain: FORWARD
+        source: 10.8.0.0/24
+        out_interface: "{{ ansible_facts['default_ipv4']['interface'] }}"
+        jump: ACCEPT
+
+    - name: Forwarding for return traffic
+      ansible.builtin.iptables:
+        chain: FORWARD
+        destination: 10.8.0.0/24
+        in_interface: "{{ ansible_facts['default_ipv4']['interface'] }}"
+        match: state
+        ctstate: ESTABLISHED,RELATED
+        jump: ACCEPT
+
+    - name: Allow OpenVPN {{ openvpn_protocol }} {{ openvpn_port }} traffic
+      ansible.builtin.iptables:
+        chain: INPUT
+        protocol: "{{ openvpn_protocol }}"
+        destination_port: "{{ openvpn_port }}"
+        jump: ACCEPT

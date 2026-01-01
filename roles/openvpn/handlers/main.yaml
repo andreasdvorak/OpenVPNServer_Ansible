@@ -1,5 +1,12 @@
 ---
 - name: Restart OpenVPN
   ansible.builtin.service:
-    name: openvpn
+    name: openvpn@{{ openvpn_easyrsa_server_name }}
     state: restarted
+
+- name: Save current state of the firewall for ipv4
+  community.general.iptables_state:
+    ip_version: ipv4
+    table: filter
+    state: saved
+    path: /etc/iptables/rules.v4

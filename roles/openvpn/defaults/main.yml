@@ -1,8 +1,10 @@
 ---
-openvpn_easy_rsa_url: "https://github.com/OpenVPN/easy-rsa/releases/download/\
-                       v{{ openvpn_easy_rsa_version }}/\
-                       EasyRSA-{{ openvpn_easy_rsa_version }}.tgz"
-openvpn_easy_rsa_dest: "/home/openvpn"
+openvpn_easyrsa_url: "https://github.com/OpenVPN/easy-rsa/releases/download/\
+                       v{{ openvpn_easyrsa_version }}/\
+                       EasyRSA-{{ openvpn_easyrsa_version }}.tgz"
+openvpn_easyrsa_dest: "/home/openvpn"
 openvpn_home: "/home/openvpn"
-openvpn_easy_rsa_server_name: "server"
+openvpn_easyrsa_server_name: "server"
 openvpn_ta_enabled: true        # Enable tls-auth
+openvpn_port: 1194
+openvpn_protocol: udp

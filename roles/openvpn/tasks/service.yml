@@ -1,23 +1,28 @@
 ---
-- name: Check if server.conf exists
+- name: Check if conf file exists
   ansible.builtin.stat:
-    path: "/etc/openvpn/server.conf"
+    path: "/etc/openvpn/{{ openvpn_easyrsa_server_name }}.conf"
   register: openvpn_server_conf_file
 
 - name: Copy server.conf to /etc/openvpn
   ansible.builtin.copy:
     src: "/usr/share/doc/openvpn/examples/sample-config-files/server.conf"
-    dest: "/etc/openvpn/server.conf"
+    dest: "/etc/openvpn/{{ openvpn_easyrsa_server_name }}.conf"
     remote_src: true
     mode: '0644'
   when:
     - not openvpn_server_conf_file.stat.exists
 
-- name: Update OpenVPN server.conf
+- name: Update OpenVPN conf file
   ansible.builtin.lineinfile:
-    path: "/etc/openvpn/server.conf"
+    path: "/etc/openvpn/{{ openvpn_easyrsa_server_name }}.conf"
     regexp: "{{ item.regexp }}"
     line: "{{ item.line }}"
     state: present
   loop: "{{ openvpn_server_conf_lines }}"
   notify: Restart OpenVPN
+
+- name: Enable OpenVPN
+  ansible.builtin.service:
+    name: openvpn@{{ openvpn_easyrsa_server_name }}
+    enabled: true

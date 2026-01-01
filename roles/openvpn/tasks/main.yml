@@ -1,20 +1,24 @@
 ---
-#- name: Configure user
-#  ansible.builtin.import_tasks:
-#    file: user.yml
-#
-#- name: Install OpenVPN package
-#  ansible.builtin.import_tasks:
-#    file: install.yml
-#
-#- name: Installation of EasyRSA
-#  ansible.builtin.import_tasks:
-#    file: easyrsa.yml
-#
-#- name: Configure clients
-#  ansible.builtin.import_tasks:
-#    file: clients.yml
-#
+- name: Configure user
+  ansible.builtin.import_tasks:
+    file: user.yml
+
+- name: Install OpenVPN package
+  ansible.builtin.import_tasks:
+    file: install.yml
+
+- name: Installation of EasyRSA
+  ansible.builtin.import_tasks:
+    file: easyrsa.yml
+
+- name: Configure clients
+  ansible.builtin.import_tasks:
+    file: clients.yml
+
 - name: Configure OpenVPN service
   ansible.builtin.import_tasks:
     file: service.yml
+
+- name: Configure the network
+  ansible.builtin.import_tasks:
+    file: network.yml

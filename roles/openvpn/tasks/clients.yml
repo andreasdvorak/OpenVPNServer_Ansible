@@ -19,7 +19,7 @@
 
 - name: Check client certificate request file
   ansible.builtin.stat:
-    path: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+    path: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}/\
             pki/regs/{{ openvpn_client_name }}.req"
   register: openvpn_client_req_file
 
@@ -32,9 +32,9 @@
       - "{{ openvpn_client_name }}"
       - nopass
   args:
-    chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
-              {{ openvpn_easy_rsa_version }}/pki/reqs/\
+    chdir: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}"
+    creates: "{{ openvpn_easyrsa_dest }}/EasyRSA-\
+              {{ openvpn_easyrsa_version }}/pki/reqs/\
               {{ openvpn_client_name }}.req"
   when:
     - not openvpn_client_req_file.stat.exists
@@ -49,16 +49,16 @@
       - client
       - "{{ openvpn_client_name }}"
   args:
-    chdir: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}"
-    creates: "{{ openvpn_easy_rsa_dest }}/EasyRSA-\
-              {{ openvpn_easy_rsa_version }}/\
+    chdir: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}"
+    creates: "{{ openvpn_easyrsa_dest }}/EasyRSA-\
+              {{ openvpn_easyrsa_version }}/\
               pki/issued/{{ openvpn_client_name }}.crt"
   when:
     - not ansible_check_mode
 
 - name: Copy client crt file to clients config
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+    src: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}/\
            pki/issued/{{ openvpn_client_name }}.crt"
     dest: "{{ openvpn_home }}/client-configs/files"
     remote_src: true
@@ -66,7 +66,7 @@
 
 - name: Copy ta.key file to open vpn home
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+    src: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}/\
            ta.key"
     dest: "{{ openvpn_home }}/client-configs/files"
     remote_src: true
@@ -74,7 +74,7 @@
 
 - name: Copy client key file to open vpn home
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+    src: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}/\
            pki/private/{{ openvpn_client_name }}.key"
     dest: "{{ openvpn_home }}/client-configs/files"
     remote_src: true
@@ -82,8 +82,31 @@
 
 - name: Copy ca.crt file to clients config
   ansible.builtin.copy:
-    src: "{{ openvpn_easy_rsa_dest }}/EasyRSA-{{ openvpn_easy_rsa_version }}/\
+    src: "{{ openvpn_easyrsa_dest }}/EasyRSA-{{ openvpn_easyrsa_version }}/\
            pki/ca.crt"
     dest: "{{ openvpn_home }}/client-configs/files"
     remote_src: true
     mode: '0644'
+
+- name: Check if conf file exists
+  ansible.builtin.stat:
+    path: "{{ openvpn_home }}/client-configs/client.conf"
+  register: openvpn_client_conf_file
+
+- name: Copy client.conf to {{ openvpn_home }}/client-configs
+  ansible.builtin.copy:
+    src: "/usr/share/doc/openvpn/examples/sample-config-files/client.conf"
+    dest: "{{ openvpn_home }}/client-configs/client.conf"
+    remote_src: true
+    mode: '0644'
+  when:
+    - not openvpn_client_conf_file.stat.exists
+
+- name: Update OpenVPN client conf file
+  ansible.builtin.lineinfile:
+    path: "{{ openvpn_home }}/client-configs/client.conf"
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+    state: present
+  loop: "{{ openvpn_client_conf_lines }}"
+  notify: Restart OpenVPN
